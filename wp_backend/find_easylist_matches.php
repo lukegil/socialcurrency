@@ -14,29 +14,12 @@
         curl_close ($ch);
         return $resp;
     };
+    
+    function get_easylist($filepath) {
+        $str = file_get_contents($filepath);
+        $list = explode("\n", $str);
 
-    function check_children(DOMNode $child_node, &$match_list, &$new_list) {
-
-        foreach ($child_node -> childNodes as $node) {
-            $i = 0;
-            $n_txt = $node -> ownerDocument -> saveHTML($node);
-
-            foreach($match_list as
-            $el) {
-
-                if ($el && strpos($n_text, $el) > -1) {
-                    array_push($new_list, $el);
-
-                    // we found it once, so don't need to look again
-                    unset($match_list[$i]);
-                }
-                $i++;
-            }
-
-            if ($node -> hasChildNodes()) {
-                check_children($node, $match_list, $new_list);
-            }
-        }
+        return $list;
     };
 
     function search_html($html, $match_list) {
@@ -70,13 +53,6 @@
         }
 
         return $new_list;
-    };
-
-    function get_easylist($filepath) {
-        $str = file_get_contents($filepath);
-        $list = explode("\n", $str);
-
-        return $list;
     };
 
     function build_table($list) {
