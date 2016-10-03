@@ -3,8 +3,8 @@
 # Social Currency
 
 ## To Dos - 
-- convert https://easylist.to/easylist/easylist.txt into list of relevant substrings (there's some markup that I don't think I need)
-- create background php script to check and save matches of previous list 
+- convert https://easylist.to/easylist/easylist.txt into list of relevant substrings (there's some markup that I don't think I need) - DONE
+- create background php script to check and save matches of previous list  - INITIAL DONE
   - this will run every 12 hours or so, so we're not comparing unnecessarily.
 - create background php script to convert list of strings into JS Object : 
 ```
