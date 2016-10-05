@@ -31,6 +31,9 @@ def parse_easylist_line(line):
     # currently not dealing with wildcard chars
     if ("*" in line):
         s = line.split("*")
+        if (len(s) > 2):
+            return ""
+            
         if (len(s[0]) >= len(s[1])):
             line = s[0]
         else:
@@ -46,15 +49,6 @@ def parse_easylist_line(line):
                 line = k
                 l = kl
 
-    # currently not dealing with '^'
-    if ("^" in line):
-        s = line.split("^")
-        l = 0
-        for k in s:
-            kl = len(k)
-            if kl > l:
-                line = k
-                l = kl
 
     # lazy with selectors
     if (line[:2] == "##"):
@@ -71,6 +65,16 @@ def parse_easylist_line(line):
                     if len(sub) > len(q):
                         q = sub
             line = q
+
+    # currently not dealing with '^'
+    if ("^" in line):
+        s = line.split("^")
+        l = 0
+        for k in s:
+            kl = len(k)
+            if kl > l:
+                line = k
+                l = kl
 
     # remove trailing non-alphanumerics
     if (not line[-1].isalnum()): line = line[:-1]
