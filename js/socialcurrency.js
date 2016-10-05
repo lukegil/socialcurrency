@@ -11,7 +11,9 @@ var SocialCurrency = function() {
 }
 
 SocialCurrency.prototype.init = function() {
+
     if (this.rm_ads()) {
+        this.add_dom_listener();
         this.remove_all_ads();
         return;
     }
@@ -28,7 +30,7 @@ SocialCurrency.prototype.vals = {
     listener_selector : "#scrr-post-btm",
 };
 
-SocialCurrency.prototype.base_obj = function() {
+SocialCurrency.prototype.get_base_obj = function() {
     return {
         never_show : false,
         last_shown : Date.now(),
@@ -38,19 +40,28 @@ SocialCurrency.prototype.base_obj = function() {
 };
 
 SocialCurrency.prototype.rm_ads = function() {
+    /* return bool
+
+    Check whether or not ads should be removed, based on localstorage object
+    */
+
     var ls = this.get_localstorage();
     if (!ls)
         return false;
-    var rm_ads = ls.has_shared && ls.last_shared > Date.now() - this.vals.default_time
+    var rm_ads = ls.has_shared && ls.last_shared > (Date.now() - this.vals.default_time)
     if (rm_ads)
         return true;
     return false;
 };
 
 SocialCurrency.prototype.show_scrr = function() {
+    /* return bool
+
+    Check if the popup should be shown, based on localStorage object
+    */
     var ls = this.get_localstorage();
     if (!ls)
-        ls = this.base_obj();
+        ls = this.get_base_obj();
     if (ls.never_show || ls.last_shown < Date.now() - ls.vals.show_every )
         return false;
     else
@@ -78,72 +89,99 @@ SocialCurrency.prototype.set_localstorage = function(o) {
 
 
 SocialCurrency.prototype.remove_all_ads = function() {
+    /* wrapper for remove advert functions */
+
     this.remove_ad_scripts();
-    // this.remove_ad_requests();
     this.remove_ad_boxes();
+
 
 };
 
 SocialCurrency.prototype.remove_ad_scripts = function() {
-    this.search_and_destroy(document.scripts, this);
+    this.search_and_destroy(document.scripts, this, true);
 }
 
 SocialCurrency.prototype.remove_ad_boxes = function() {
-    this.search_and_destroy(document.head.children, this);
-    this.search_and_destroy(document.body.children, this);
+    if (document.head)
+        this.search_and_destroy(document.head.children, this);
+    if (document.body)
+        this.search_and_destroy(document.body.children, this);
 }
 
 SocialCurrency.prototype.search_and_destroy = function(nodes, parent_scope) {
+    /* recursively search a nodeList and remove any which may have adverts */
+
+    var is_script = is_script || false
     var nl = nodes.length;
-
-    for (var i = 0; i < nl; i++)
+    for (var i = 0; i < nl; i++) {
         var c;
-        if (parent_scope.find_match(nodes[i], parent_scope))
-            nodes[i].remove();
-        else if ((c = nodes[i].children))
-            parent_scope.search_and_destroy(c, parent_scope);
 
+        if (parent_scope.find_match(nodes[i], parent_scope, is_script)) {
+            nodes[i].remove();
+            i--;
+            nl--;
+        } else if (nodes[i] && (c = nodes[i].children) && c.length > 0)
+            parent_scope.search_and_destroy(c, parent_scope, is_script);
+    }
 }
 
-SocialCurrency.prototype.find_match = function(node, parent_scope) {
+SocialCurrency.prototype.find_match = function(node, parent_scope, scripts) {
+    /* return bool
+
+    determine whether node may have adverts in it
+
+    node - @type - a DOM node
+         - @param - the node you're searching
+    parent_scope - @type - object
+                 - @param - the SocialCurrency object
+    scripts - @type - bool
+            - @param - whether or not a <script> node is being checked
+
+    */
+    var is_script = scripts || false;
     var string = "";
-    var na = node.attributes;
+    var na;
+
+    if (node && node.attributes)
+        na = node.attributes;
+    else
+        na = [];
+
     for (var j = 0; j < na.length; j++)
         string += na[j].textContent + " ";
 
-    for (key in parent_scope.string_match_table) {
+    if (is_script && node)
+        string += " " + node.textContent;
 
-        var min_len = parent_scope.string_match_table[key].min_len;
-        var i = string.slice(q1 + min_len, q2).indexOf(key)
-        if (i === -1)
-            continue
-
-        var tbl = parent_scope.string_match_table;
-        var str_ltr;
-        while ( (i -= 1) >= 0 && (tbl = tbl[string[i]]) )
-            if (tbl == true)
-                return true;
+    var tbl = parent_scope.get_string_table();
+    for (key in tbl) {
+        if (string.indexOf(tbl[key]) > -1) {
+            return true;
+        }
     }
     return false;
 };
 
-SocialCurrency.prototype.str_compare = function()
-
-
-SocialCurrency.prototype.add_listener = function() {
-
-// Reference: http://www.html5rocks.com/en/tutorials/speed/animations/
-var last_known_scroll_position = 0;
-var ticking = false;
-
-window.addEventListener('scroll', function(e) {
-    last_known_scroll_position = window.scrollY;
-    if (!ticking) {
-        window.requestAnimationFrame(function() {
-            doSomething(last_known_scroll_position);
-            ticking = false;
-        });
-    }
-    ticking = true;
-    });
+SocialCurrency.prototype.set_string_table = function(obj) {
+    this.string_match_table = obj;
 };
+
+SocialCurrency.prototype.get_string_table = function() {
+    return this.string_match_table;
+};
+
+SocialCurrency.prototype.add_dom_listener = function() {
+    /* Whenever a mutation to the DOM is observed, search_and_destroy is
+        run on the affected nodes
+    */
+
+    var target = document.querySelector("html");
+    var parent_scope = this;
+    var observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            parent_scope.search_and_destroy(mutation.addedNodes, parent_scope, true, true);
+        });
+  }, parent_scope);
+    var config = { attributes: true, childList: true, characterData: true, subtree : true };
+    observer.observe(target, config);
+}
