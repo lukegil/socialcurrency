@@ -1,7 +1,8 @@
 <?php
 
-    $easy_list = "../new_easylist.txt";
-    $site_url = "https://techcrunch.com";
+    $easy_list = "./new_easylist.txt";
+    $site_url = "http://www.recode.net/";
+
 
     function get_page($url) {
         /* GET a page. */
@@ -14,7 +15,7 @@
         curl_close ($ch);
         return $resp;
     };
-    
+
     function get_easylist($filepath) {
         $str = file_get_contents($filepath);
         $list = explode("\n", $str);
@@ -22,7 +23,7 @@
         return $list;
     };
 
-    function search_html($html, $match_list) {
+    function search_html($html, $match_list, $new_list = Array()) {
         /* return a Array of easylist elements that are on page
 
         $html - @type - cURL handle
@@ -30,7 +31,12 @@
 
         $match_list - @type - Array
                     - @param - list of strings to search for
+
+        $new_list - @type - Array
+                  - @param - list of matched terms in match list. Only used
+                             if this is the second+ page of a site visited.
         */
+
         $dom = new DOMDocument;
         $dom -> encoding = "UTF-8";
         $dom -> substituteEntities = false;
@@ -43,6 +49,7 @@
         $n_text = $n_text -> ownerDocument -> saveHTML($n_text);
         $n_text = html_entity_decode($n_text);
         foreach($match_list as $el) {
+
             if ($el && strpos($n_text, $el) > -1) {
                 array_push($new_list, $el);
 
@@ -91,7 +98,8 @@
 
     $ch = get_page($site_url);
     $list = get_easylist($easy_list);
-    $clean_list = search_html($ch, $list);
-    $table = build_table($clean_list);
-    $json_table = json_encode($table);
+
+    $clean_list = json_encode(search_html($ch, $list));
+
+
  ?>
