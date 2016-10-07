@@ -13,13 +13,17 @@ var SocialCurrency = function() {
 SocialCurrency.prototype.init = function() {
 
     if (this.rm_ads()) {
+        console.log("removing ads");
         this.add_dom_listener();
         this.remove_all_ads();
-        return;
+        console.log("done removing");
     }
 
-    if (this.show_scrr())
-        this.add_listener();
+    if (this.show_scrr() || 1 == 1) {
+        /* To Do -- make an on ready event */
+        this.add_pop_listener();
+        console.log("added pop");
+    }
 }
 
 SocialCurrency.prototype.vals = {
@@ -28,6 +32,10 @@ SocialCurrency.prototype.vals = {
     default_time : 604800000, // one week
     show_every : 86400000, // one day
     listener_selector : "#scrr-post-btm",
+    twitter_url : "",
+    scrr_pop : "#scrr-question",
+    scrr_btn : ".scrr-btn",
+    screen_wipe : ".scrr-screen-wipe",
 };
 
 SocialCurrency.prototype.get_base_obj = function() {
@@ -62,7 +70,7 @@ SocialCurrency.prototype.show_scrr = function() {
     var ls = this.get_localstorage();
     if (!ls)
         ls = this.get_base_obj();
-    if (ls.never_show || ls.last_shown < Date.now() - ls.vals.show_every )
+    if (ls.never_show || ls.last_shown < Date.now() - this.vals.show_every )
         return false;
     else
         return true;
@@ -87,14 +95,11 @@ SocialCurrency.prototype.set_localstorage = function(o) {
     window.localStorage.setItem(this.vals.local_storage_obj, l);
 };
 
-
 SocialCurrency.prototype.remove_all_ads = function() {
     /* wrapper for remove advert functions */
 
     this.remove_ad_scripts();
     this.remove_ad_boxes();
-
-
 };
 
 SocialCurrency.prototype.remove_ad_scripts = function() {
@@ -184,4 +189,86 @@ SocialCurrency.prototype.add_dom_listener = function() {
   }, parent_scope);
     var config = { attributes: true, childList: true, characterData: true, subtree : true };
     observer.observe(target, config);
+};
+
+SocialCurrency.prototype.add_pop_listener = function() {
+    console.log("addinglistener");
+    this.vals.ticking = false;
+    this.vals.scroll_y = window.innerHeight + window.scrollY;
+
+    this.vals.insert_dist = document.querySelector(this.vals.listener_selector).offsetTop;
+    this.vals.popped = false;
+    // TO Do , pass parent scope to listener and insert_pop
+    window.addEventListener("scroll", function() {
+        var parent_scope = window.scrr;
+
+        if (!parent_scope.vals.ticking)
+            window.requestAnimationFrame(function() {
+                var scroll_y = parent_scope.vals.scroll_y = window.innerHeight + window.scrollY;
+                //console.log(parent_scope);
+                var insert_dist = parent_scope.vals.insert_dist;
+                // console.log("scoll_y : " + scroll_y);
+                // console.log("insert_dist : " + insert_dist);
+                if (!parent_scope.vals.popped && scroll_y >= insert_dist) {
+                    console.log("in first conditional");
+                    //console.log(parent_scope);
+                    parent_scope.vals.node = parent_scope.insert_pop(parent_scope);
+                    parent_scope.vals.node_height = parent_scope.vals.node.offsetHeight;
+                    parent_scope.vals.popped = true;
+                } else if (parent_scope.vals.popped && scroll_y >= insert_dist) {
+                    console.log("in second");
+                    var new_bottom = scroll_y - insert_dist;
+                    new_bottom -= parent_scope.vals.node_height;
+
+                    if (new_bottom >= 0)
+                        new_bottom = 0;
+                    else if (new_bottom > parent_scope.vals.node_height + 10)
+                        new_bottom = parent_scope.vals.node_height + 10
+
+                    parent_scope.vals.node.style.bottom = new_bottom + "px";
+                } else if (parent_scope.vals.popped && scroll_y < insert_dist) {
+                    new_bottom = -1 * (parent_scope.vals.node_height + 10)
+                    parent_scope.vals.node.style.bottom = new_bottom + "px";
+                }
+                parent_scope.vals.ticking = false;
+            });
+        parent_scope.vals.ticking = true;
+    });
+};
+
+SocialCurrency.prototype.add_affirm_listener = function() {
+    var node = document.querySelector(this.vals.scrr_btn);
+    node.addEventListener("click", function(e) {
+        var parent_scope = window.scrr;
+        var x = e.screenX;
+        var y = e.screenY;
+        parent_scope.screen_wipe(x,y);
+    })
 }
+
+SocialCurrency.prototype.screen_wipe = function(x, y) {
+
+    //tk
+    var node = document.querySelector(this.vals.screen_wipe);
+    node.style.top = y + "px";
+    node.style.left = x + "px";
+
+    node.style.transition = "border-width : 0.2s";
+
+};
+
+SocialCurrency.prototype.insert_pop = function(parent_scope) {
+    var node = document.querySelector(parent_scope.vals.scrr_pop);
+    var h = node.offsetHeight;
+    node.style.display = "initial";
+    node.style.bottom = (0 - h) + "px";
+
+    return node;
+};
+
+SocialCurrency.prototype.check_share_twitter = function() {
+};
+
+scrr = new SocialCurrency();
+scrr.init();
+console.log('inited');
