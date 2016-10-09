@@ -22,6 +22,9 @@ SocialCurrency.prototype.init = function() {
     if (this.show_scrr() || 1 == 1) {
         /* To Do -- make an on ready event */
         this.add_pop_listener();
+        this.add_affirm_listener();
+        this.add_close_listener();
+        this.add_social_listener();
         console.log("added pop");
     }
 }
@@ -36,6 +39,11 @@ SocialCurrency.prototype.vals = {
     scrr_pop : "#scrr-question",
     scrr_btn : ".scrr-btn",
     screen_wipe : ".scrr-screen-wipe",
+    screen_one : ".screen-one",
+    social_screen : ".scrr-share-screen",
+    social_btns : ".scrr-social-btns > div",
+    close : ".scrr-close",
+    success_screen : ".scrr-success"
 };
 
 SocialCurrency.prototype.get_base_obj = function() {
@@ -240,11 +248,47 @@ SocialCurrency.prototype.add_affirm_listener = function() {
     var node = document.querySelector(this.vals.scrr_btn);
     node.addEventListener("click", function(e) {
         var parent_scope = window.scrr;
-        var x = e.screenX;
-        var y = e.screenY;
-        parent_scope.screen_wipe(x,y);
+
+        // var x = e.screenX;
+        // var y = e.screenY;
+        // parent_scope.screen_wipe(x,y);
+
+        var node1 = document.querySelector(parent_scope.vals.screen_one);
+        node1.style.display = "none";
+
+        var node2 = document.querySelector(parent_scope.vals.social_screen);
+        node2.style.display = "initial";
+
     })
-}
+};
+
+SocialCurrency.prototype.add_close_listener = function() {
+    var nodes = document.querySelectorAll(this.vals.close);
+    console.log(nodes);
+    for (var indx = 0; indx < nodes.length; indx++)
+        nodes[indx].addEventListener("click", function() {
+            var parent_scope = window.scrr;
+            var node1 = document.querySelector(parent_scope.vals.scrr_pop);
+            node1.style.display = "none";
+        });
+};
+
+SocialCurrency.prototype.add_social_listener = function() {
+    var nodes = document.querySelectorAll(this.vals.social_btns);
+    for (var indx = 0; indx < nodes.length; indx++)
+        nodes[indx].addEventListener("click", function() {
+            var parent_scope = window.scrr;
+            parent_scope.show_success();
+        });
+};
+
+SocialCurrency.prototype.show_success = function() {
+    var node1 = document.querySelector(this.vals.social_screen);
+    node1.style.display = "none";
+
+    var node2 = document.querySelector(this.vals.success_screen);
+    node2.style.display = "initial";
+};
 
 SocialCurrency.prototype.screen_wipe = function(x, y) {
 
@@ -260,14 +304,13 @@ SocialCurrency.prototype.screen_wipe = function(x, y) {
 SocialCurrency.prototype.insert_pop = function(parent_scope) {
     var node = document.querySelector(parent_scope.vals.scrr_pop);
     var h = node.offsetHeight;
-    node.style.display = "initial";
     node.style.bottom = (0 - h) + "px";
+    node.style.display = "initial";
+
 
     return node;
 };
 
-SocialCurrency.prototype.check_share_twitter = function() {
-};
 
 scrr = new SocialCurrency();
 scrr.init();
