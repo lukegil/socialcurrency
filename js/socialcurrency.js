@@ -22,9 +22,9 @@ SocialCurrency.prototype.init = function() {
     if (this.show_scrr() || 1 == 1) {
         /* To Do -- make an on ready event */
         this.add_pop_listener();
-        this.add_affirm_listener();
         this.add_close_listener();
         this.add_social_listener();
+        this.add_fb_sdk();
         console.log("added pop");
     }
 }
@@ -40,20 +40,14 @@ SocialCurrency.prototype.vals = {
     scrr_btn : ".scrr-btn",
     screen_wipe : ".scrr-screen-wipe",
     screen_one : ".screen-one",
-    social_screen : ".scrr-share-screen",
-    social_btns : ".scrr-social-btns > div",
+    social_screen : ".screen-one",
+    social_btns : ".scrr-fb",
+    fb_btn : ".scrr-fb",
     close : ".scrr-close",
     success_screen : ".scrr-success"
 };
 
-SocialCurrency.prototype.get_base_obj = function() {
-    return {
-        never_show : false,
-        last_shown : Date.now(),
-        has_shared : false,
-        last_shared : Date.now(),
-    }
-};
+
 
 SocialCurrency.prototype.rm_ads = function() {
     /* return bool
@@ -84,13 +78,14 @@ SocialCurrency.prototype.show_scrr = function() {
         return true;
 }
 
-SocialCurrency.prototype.get_session_count = function() {
-    var c = window.sessionStorage.getItem(this.vals.session_count_key);
-    return parseInt(c);
-};
-
-SocialCurrency.prototype.set_session_count = function(c) {
-    window.sessionStorage.setItem(this.vals.session_count_key, c);
+SocialCurrency.prototype.get_base_obj = function() {
+    return {
+        never_show : false,
+        last_shown : Date.now(),
+        has_shared : false,
+        last_shared : Date.now(),
+        session_count : 0,
+    }
 };
 
 SocialCurrency.prototype.get_localstorage = function() {
@@ -102,6 +97,21 @@ SocialCurrency.prototype.set_localstorage = function(o) {
     var l = JSON.stringify(o);
     window.localStorage.setItem(this.vals.local_storage_obj, l);
 };
+
+SocialCurrency.prototype.get_session_count = function() {
+    var c = window.sessionStorage.getItem(this.vals.session_count_key);
+    return parseInt(c);
+};
+
+SocialCurrency.prototype.set_session_count = function(c) {
+    window.sessionStorage.setItem(this.vals.session_count_key, c);
+};
+
+SocialCurrency.prototype.set_shared = function() {
+    var l = this.get_localstorage();
+    l.last_shared = Date.now();
+    l.has_shared = true;
+}
 
 SocialCurrency.prototype.remove_all_ads = function() {
     /* wrapper for remove advert functions */
@@ -274,13 +284,32 @@ SocialCurrency.prototype.add_close_listener = function() {
 };
 
 SocialCurrency.prototype.add_social_listener = function() {
-    var nodes = document.querySelectorAll(this.vals.social_btns);
-    for (var indx = 0; indx < nodes.length; indx++)
-        nodes[indx].addEventListener("click", function() {
-            var parent_scope = window.scrr;
-            parent_scope.show_success();
-        });
+    this.add_fb_listener();
 };
+
+SocialCurrency.prototype.add_fb_listener = function() {
+    var node = document.querySelector(this.vals.fb_btn);
+    node.addEventListener("click",function() {
+        var parent_scope = window.scrr;
+        FB.ui({
+            method: 'share',
+            display: 'popup',
+            href: window.location.href,
+        }, function(r){parent_scope.fb_resp});
+    })
+};
+
+SocialCurrency.prototype.fb_resp = function(r) {
+    if (Array.isArray(r))
+        this.success_flow();
+    else
+        this.fail_flow();
+};
+
+SocialCurrency.prototype.success_flow = function() {
+    this.set_shared();
+    this.show_success();
+}
 
 SocialCurrency.prototype.show_success = function() {
     var node1 = document.querySelector(this.vals.social_screen);
@@ -288,6 +317,8 @@ SocialCurrency.prototype.show_success = function() {
 
     var node2 = document.querySelector(this.vals.success_screen);
     node2.style.display = "initial";
+
+
 };
 
 SocialCurrency.prototype.screen_wipe = function(x, y) {
@@ -310,6 +341,28 @@ SocialCurrency.prototype.insert_pop = function(parent_scope) {
 
     return node;
 };
+
+SocialCurrency.prototype.add_fb_sdk = function() {
+    window.fbAsyncInit = function() {
+        FB.init({
+            appId      : '328968017464530',
+            xfbml      : true,
+            version    : 'v2.8'
+        });
+        FB.AppEvents.logPageView();
+     };
+
+    var d = document;
+    var s = 'script';
+    var id = 'facebook-jssdk';
+
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) {return;}
+    js = d.createElement(s); js.id = id;
+    js.src = "https://connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+};
+
 
 
 scrr = new SocialCurrency();
