@@ -5,7 +5,7 @@
 
 
     function get_page($url) {
-        /* GET a page. */
+        /* GET an html page */
         $ch = curl_init();
         curl_setopt ($ch, CURLOPT_URL, $url);
         curl_setopt ($ch, CURLOPT_HEADER, 0);
@@ -66,7 +66,7 @@
         /* Returns an associative array
 
         $list - @type - array of strings
-              - @param - An array of substrings to check the page foreach
+              - @param - An array of substrings to check the page for
         */
 
         $table = Array();
@@ -98,7 +98,6 @@
 
     $ch = get_page($site_url);
     $list = get_easylist($easy_list);
-
     $clean_list = json_encode(search_html($ch, $list));
 
 
