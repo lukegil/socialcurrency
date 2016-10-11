@@ -15,15 +15,13 @@ SocialCurrency.prototype.init = function() {
         this.set_localstorage(this.get_base_obj());
 
     if (this.rm_ads()) {
-        console.log("removing ads");
         this.add_rm_listeners();
         this.remove_all_ads();
-        console.log("done removing");
     }
 
-    if (this.show_scrr() || 1 == 1) {
+    if (this.show_scrr())
         this.add_show_listeners();
-    }
+
 
     var c = this.get_session_count();
     this.set_session_count(c++);
@@ -108,7 +106,8 @@ SocialCurrency.prototype.show_scrr = function() {
     var ls = this.get_localstorage();
     if (!ls)
         ls = this.get_base_obj();
-    if ((ls.never_show || ls.last_shown < Date.now() - this.vals.show_every) && this.get_session_count() < 1 )
+
+    if ((ls.never_show || ls.last_shown > Date.now() - this.vals.show_every) && this.get_session_count() < 1 )
         return false;
     else
         return true;
@@ -258,7 +257,6 @@ SocialCurrency.prototype.add_show_listeners = function() {
 };
 
 SocialCurrency.prototype.add_pop_listener = function() {
-    console.log("addinglistener");
     this.vals.ticking = false;
     this.vals.scroll_y = window.innerHeight + window.scrollY;
     this.vals.insert_dist = document.querySelector(this.vals.listener_selector).offsetTop;
