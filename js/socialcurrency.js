@@ -1,7 +1,7 @@
 /*
 Notes :
-    - going to have to insert a div at the bottom of the post
-    so I can add a listener
+    - Going to have to have them create a developer account and insert appId
+
 */
 
 
@@ -14,19 +14,18 @@ SocialCurrency.prototype.init = function() {
 
     if (this.rm_ads()) {
         console.log("removing ads");
-        this.add_dom_listener();
+        this.add_rm_listeners();
         this.remove_all_ads();
         console.log("done removing");
     }
 
-    if (this.show_scrr() || 1 == 1) {
+    if (this.show_scrr()) {
         /* To Do -- make an on ready event */
-        this.add_pop_listener();
-        this.add_close_listener();
-        this.add_social_listener();
-        this.add_fb_sdk();
-        console.log("added pop");
+        this.add_show_listeners();
     }
+
+    var c = this.get_session_count();
+    this.set_session_count(c++);
 }
 
 SocialCurrency.prototype.vals = {
@@ -47,36 +46,9 @@ SocialCurrency.prototype.vals = {
     success_screen : ".scrr-success"
 };
 
-
-
-SocialCurrency.prototype.rm_ads = function() {
-    /* return bool
-
-    Check whether or not ads should be removed, based on localstorage object
-    */
-
-    var ls = this.get_localstorage();
-    if (!ls)
-        return false;
-    var rm_ads = ls.has_shared && ls.last_shared > (Date.now() - this.vals.default_time)
-    if (rm_ads)
-        return true;
-    return false;
-};
-
-SocialCurrency.prototype.show_scrr = function() {
-    /* return bool
-
-    Check if the popup should be shown, based on localStorage object
-    */
-    var ls = this.get_localstorage();
-    if (!ls)
-        ls = this.get_base_obj();
-    if (ls.never_show || ls.last_shown < Date.now() - this.vals.show_every )
-        return false;
-    else
-        return true;
-}
+/*************/
+/*** storage object ***/
+/*************/
 
 SocialCurrency.prototype.get_base_obj = function() {
     return {
@@ -100,6 +72,8 @@ SocialCurrency.prototype.set_localstorage = function(o) {
 
 SocialCurrency.prototype.get_session_count = function() {
     var c = window.sessionStorage.getItem(this.vals.session_count_key);
+    if (!c)
+        c = 0;
     return parseInt(c);
 };
 
@@ -111,7 +85,53 @@ SocialCurrency.prototype.set_shared = function() {
     var l = this.get_localstorage();
     l.last_shared = Date.now();
     l.has_shared = true;
+    this.set_localstorage(l);
+};
+
+SocialCurrency.prototype.set_last_shown = function() {
+    var l = this.get_localstorage();
+    l.last_shown = Date.now();
+    this.set_localstorage(l);
 }
+
+/**************/
+/** "show" logic **/
+/**************/
+
+SocialCurrency.prototype.show_scrr = function() {
+    /* return bool
+
+    Check if the popup should be shown, based on localStorage object
+    */
+    var ls = this.get_localstorage();
+    if (!ls)
+        ls = this.get_base_obj();
+    if ((ls.never_show || ls.last_shown < Date.now() - this.vals.show_every) && this.get_session_count() < 1 )
+        return false;
+    else
+        return true;
+}
+
+
+SocialCurrency.prototype.rm_ads = function() {
+    /* return bool
+
+    Check whether or not ads should be removed, based on localstorage object
+    */
+
+    var ls = this.get_localstorage();
+    if (!ls)
+        return false;
+    var rm_ads = ls.has_shared && ls.last_shared > (Date.now() - this.vals.default_time)
+    if (rm_ads)
+        return true;
+    return false;
+};
+
+
+/*************/
+/** Ad Removal **/
+/*************/
 
 SocialCurrency.prototype.remove_all_ads = function() {
     /* wrapper for remove advert functions */
@@ -132,7 +152,10 @@ SocialCurrency.prototype.remove_ad_boxes = function() {
 }
 
 SocialCurrency.prototype.search_and_destroy = function(nodes, parent_scope) {
-    /* recursively search a nodeList and remove any which may have adverts */
+    /* recursively search a nodeList and remove any which may have adverts
+
+    TODO - Test performance of this vs TreeWalker (https://developer.mozilla.org/en-US/docs/Web/API/TreeWalker)
+    */
 
     var is_script = is_script || false
     var nl = nodes.length;
@@ -193,6 +216,15 @@ SocialCurrency.prototype.get_string_table = function() {
     return this.string_match_table;
 };
 
+
+/*************/
+/*** Listeners ***/
+/*************/
+
+SocialCurrency.prototype.add_rm_listeners = function() {
+    this.add_dom_listener();
+}
+
 SocialCurrency.prototype.add_dom_listener = function() {
     /* Whenever a mutation to the DOM is observed, search_and_destroy is
         run on the affected nodes
@@ -209,6 +241,14 @@ SocialCurrency.prototype.add_dom_listener = function() {
     observer.observe(target, config);
 };
 
+
+SocialCurrency.prototype.add_show_listeners = function() {
+    this.add_pop_listener();
+    this.add_close_listener();
+    this.add_social_listener();
+    this.add_fb_sdk();
+};
+
 SocialCurrency.prototype.add_pop_listener = function() {
     console.log("addinglistener");
     this.vals.ticking = false;
@@ -223,18 +263,17 @@ SocialCurrency.prototype.add_pop_listener = function() {
         if (!parent_scope.vals.ticking)
             window.requestAnimationFrame(function() {
                 var scroll_y = parent_scope.vals.scroll_y = window.innerHeight + window.scrollY;
-                //console.log(parent_scope);
                 var insert_dist = parent_scope.vals.insert_dist;
-                // console.log("scoll_y : " + scroll_y);
-                // console.log("insert_dist : " + insert_dist);
+
                 if (!parent_scope.vals.popped && scroll_y >= insert_dist) {
-                    console.log("in first conditional");
-                    //console.log(parent_scope);
+
                     parent_scope.vals.node = parent_scope.insert_pop(parent_scope);
                     parent_scope.vals.node_height = parent_scope.vals.node.offsetHeight;
                     parent_scope.vals.popped = true;
+                    parent_scope.set_last_shown();
+
                 } else if (parent_scope.vals.popped && scroll_y >= insert_dist) {
-                    console.log("in second");
+
                     var new_bottom = scroll_y - insert_dist;
                     new_bottom -= parent_scope.vals.node_height;
 
@@ -244,9 +283,12 @@ SocialCurrency.prototype.add_pop_listener = function() {
                         new_bottom = parent_scope.vals.node_height + 10
 
                     parent_scope.vals.node.style.bottom = new_bottom + "px";
+
                 } else if (parent_scope.vals.popped && scroll_y < insert_dist) {
+
                     new_bottom = -1 * (parent_scope.vals.node_height + 10)
                     parent_scope.vals.node.style.bottom = new_bottom + "px";
+
                 }
                 parent_scope.vals.ticking = false;
             });
@@ -308,8 +350,9 @@ SocialCurrency.prototype.fb_resp = function(r) {
 
 SocialCurrency.prototype.success_flow = function() {
     this.set_shared();
+    this.remove_ad_boxes();
     this.show_success();
-}
+};
 
 SocialCurrency.prototype.show_success = function() {
     var node1 = document.querySelector(this.vals.social_screen);
@@ -321,23 +364,12 @@ SocialCurrency.prototype.show_success = function() {
 
 };
 
-SocialCurrency.prototype.screen_wipe = function(x, y) {
-
-    //tk
-    var node = document.querySelector(this.vals.screen_wipe);
-    node.style.top = y + "px";
-    node.style.left = x + "px";
-
-    node.style.transition = "border-width : 0.2s";
-
-};
 
 SocialCurrency.prototype.insert_pop = function(parent_scope) {
     var node = document.querySelector(parent_scope.vals.scrr_pop);
     var h = node.offsetHeight;
     node.style.bottom = (0 - h) + "px";
     node.style.display = "initial";
-
 
     return node;
 };
@@ -363,8 +395,20 @@ SocialCurrency.prototype.add_fb_sdk = function() {
     fjs.parentNode.insertBefore(js, fjs);
 };
 
+/*******/
+/** page animations **.
+/*********/
 
+SocialCurrency.prototype.screen_wipe = function(x, y) {
+
+    //tk
+    var node = document.querySelector(this.vals.screen_wipe);
+    node.style.top = y + "px";
+    node.style.left = x + "px";
+
+    node.style.transition = "border-width : 0.2s";
+
+};
 
 scrr = new SocialCurrency();
 scrr.init();
-console.log('inited');
