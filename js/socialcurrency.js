@@ -19,8 +19,7 @@ SocialCurrency.prototype.init = function() {
         console.log("done removing");
     }
 
-    if (this.show_scrr()) {
-        /* To Do -- make an on ready event */
+    if (this.show_scrr() || 1 == 1) {
         this.add_show_listeners();
     }
 
@@ -236,19 +235,20 @@ SocialCurrency.prototype.add_dom_listener = function() {
         mutations.forEach(function(mutation) {
             parent_scope.search_and_destroy(mutation.addedNodes, parent_scope, true, true);
         });
-  }, parent_scope);
+    }, parent_scope);
     var config = { attributes: true, childList: true, characterData: true, subtree : true };
     observer.observe(target, config);
 };
 
 
 SocialCurrency.prototype.add_show_listeners = function() {
+    var parent_scope = this;
     document.addEventListener("readystatechange", function(){
         if (document.readyState === "complete") {
-            this.add_pop_listener();
-            this.add_close_listener();
-            this.add_social_listener();
-            this.add_fb_sdk();
+            parent_scope.add_pop_listener();
+            parent_scope.add_close_listener();
+            parent_scope.add_social_listener();
+            parent_scope.add_fb_sdk();
         }
     });
 };
@@ -257,12 +257,11 @@ SocialCurrency.prototype.add_pop_listener = function() {
     console.log("addinglistener");
     this.vals.ticking = false;
     this.vals.scroll_y = window.innerHeight + window.scrollY;
-
     this.vals.insert_dist = document.querySelector(this.vals.listener_selector).offsetTop;
     this.vals.popped = false;
-    // TO Do , pass parent scope to listener and insert_pop
+
+    var parent_scope = this;
     window.addEventListener("scroll", function() {
-        var parent_scope = window.scrr;
 
         if (!parent_scope.vals.ticking)
             window.requestAnimationFrame(function() {
@@ -302,12 +301,8 @@ SocialCurrency.prototype.add_pop_listener = function() {
 
 SocialCurrency.prototype.add_affirm_listener = function() {
     var node = document.querySelector(this.vals.scrr_btn);
+    var parent_scope = this;
     node.addEventListener("click", function(e) {
-        var parent_scope = window.scrr;
-
-        // var x = e.screenX;
-        // var y = e.screenY;
-        // parent_scope.screen_wipe(x,y);
 
         var node1 = document.querySelector(parent_scope.vals.screen_one);
         node1.style.display = "none";
@@ -320,10 +315,9 @@ SocialCurrency.prototype.add_affirm_listener = function() {
 
 SocialCurrency.prototype.add_close_listener = function() {
     var nodes = document.querySelectorAll(this.vals.close);
-    console.log(nodes);
+    var parent_scope = this;
     for (var indx = 0; indx < nodes.length; indx++)
         nodes[indx].addEventListener("click", function() {
-            var parent_scope = window.scrr;
             var node1 = document.querySelector(parent_scope.vals.scrr_pop);
             node1.style.display = "none";
         });
@@ -335,13 +329,13 @@ SocialCurrency.prototype.add_social_listener = function() {
 
 SocialCurrency.prototype.add_fb_listener = function() {
     var node = document.querySelector(this.vals.fb_btn);
+    var parent_scope = this;
     node.addEventListener("click",function() {
-        var parent_scope = window.scrr;
         FB.ui({
             method: 'share',
             display: 'popup',
             href: window.location.href,
-        }, function(r){parent_scope.fb_resp});
+        }, function(r){parent_scope.fb_resp(r)});
     })
 };
 
