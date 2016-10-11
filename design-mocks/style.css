@@ -78,7 +78,8 @@
     border-radius : 100%;
 }
 
-.scrr-share-screen {
+.scrr-share-screen,
+.scrr-nvr-again-screen {
     display : none;
 }
 
