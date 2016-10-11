@@ -243,10 +243,14 @@ SocialCurrency.prototype.add_dom_listener = function() {
 
 
 SocialCurrency.prototype.add_show_listeners = function() {
-    this.add_pop_listener();
-    this.add_close_listener();
-    this.add_social_listener();
-    this.add_fb_sdk();
+    document.addEventListener("readystatechange", function(){
+        if (document.readyState === "complete") {
+            this.add_pop_listener();
+            this.add_close_listener();
+            this.add_social_listener();
+            this.add_fb_sdk();
+        }
+    });
 };
 
 SocialCurrency.prototype.add_pop_listener = function() {
