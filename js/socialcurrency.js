@@ -42,7 +42,9 @@ SocialCurrency.prototype.vals = {
     social_btns : ".scrr-fb",
     fb_btn : ".scrr-fb",
     close : ".scrr-close",
-    success_screen : ".scrr-success"
+    success_screen : ".scrr-success",
+    never_show_btn : ".scrr-nvr-again",
+    never_show_screen : ".scrr-nvr-again-screen",
 };
 
 /*************/
@@ -249,6 +251,7 @@ SocialCurrency.prototype.add_show_listeners = function() {
             parent_scope.add_close_listener();
             parent_scope.add_social_listener();
             parent_scope.add_fb_sdk();
+            parent_scope.add_never_show_listener();
         }
     });
 };
@@ -391,6 +394,30 @@ SocialCurrency.prototype.add_fb_sdk = function() {
     js = d.createElement(s); js.id = id;
     js.src = "https://connect.facebook.net/en_US/sdk.js";
     fjs.parentNode.insertBefore(js, fjs);
+};
+
+SocialCurrency.prototype.add_never_show_listener = function() {
+    var parent_scope = this;
+    var node = document.querySelector(this.vals.never_show_btn);
+
+    node.addEventListener("click", function() {
+        parent_scope.set_never_show();
+    });
+};
+
+SocialCurrency.prototype.set_never_show = function() {
+    var l = this.get_localstorage();
+    l.never_show = true;
+    this.set_localstorage(l);
+    this.never_show_flow();
+};
+
+SocialCurrency.prototype.never_show_flow = function() {
+    var node1 = document.querySelector(this.vals.screen_one);
+    node1.style.display = "none";
+
+    var node2 = document.querySelector(this.vals.never_show_screen);
+    node2.style.display = "initial";
 };
 
 /*******/
