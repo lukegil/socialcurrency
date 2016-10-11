@@ -11,6 +11,8 @@ var SocialCurrency = function() {
 }
 
 SocialCurrency.prototype.init = function() {
+    if (!this.get_localstorage())
+        this.set_localstorage(this.get_base_obj());
 
     if (this.rm_ads()) {
         console.log("removing ads");
@@ -57,7 +59,6 @@ SocialCurrency.prototype.get_base_obj = function() {
         last_shown : Date.now(),
         has_shared : false,
         last_shared : Date.now(),
-        session_count : 0,
     }
 };
 
