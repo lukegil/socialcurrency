@@ -2,11 +2,12 @@
 
 return '<div class="scrr-fail">
     <div class="scrr-top-row">
-        <span class="scrr-close u-hover">&#10005;</span>
+        <span>&nbsp;</span>
+        <span class="scrr-close scrr-u-hover">&#10005;</span>
     </div>
     <div class="scrr-fail--txt">
-        <p>Something went wrong...</p>
-        <p>We can try again later.</p>
+        <p class="scrr-thin-text md">Something went wrong...</p>
+        <p class="scrr-thin-text md">We can try again later.</p>
     </div>
 </div>';
 ?>
