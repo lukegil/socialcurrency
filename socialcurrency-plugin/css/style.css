@@ -133,16 +133,19 @@
     line-height : 40px;
 }
 
-#scrr-question .scrr-success {
+#scrr-question .scrr-success,
+#scrr-question .scrr-fail {
     display : none;
 
 }
 
-#scrr-question .scrr-success--txt {
+#scrr-question .scrr-success--txt,
+#scrr-question .scrr-fail--txt {
     margin : 20px auto;
     text-align: center;
 }
 
-#scrr-question .scrr-success--txt p {
+#scrr-question .scrr-success--txt p,
+#scrr-question .scrr-fail--txt p {
     margin : 0;
 }

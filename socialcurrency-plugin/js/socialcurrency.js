@@ -11,7 +11,9 @@ var SocialCurrency = function() {
 }
 
 SocialCurrency.prototype.init = function() {
-    if (!this.get_localstorage())
+
+    var ls = this.get_localstorage();
+    if (ls == null || Object.keys(ls).length === 0) 
         this.set_localstorage(this.get_base_obj());
 
     if (this.rm_ads()) {
@@ -19,15 +21,13 @@ SocialCurrency.prototype.init = function() {
         this.remove_all_ads();
     }
 
+
     if (this.show_scrr())
         this.add_show_listeners();
 
-    console.log("session count before" );
-    console.log(this.get_session_count());
     var c = this.get_session_count();
     this.set_session_count(++c);
-    console.log("session_count_after");
-    console.log(this.get_session_count());
+
 }
 
 SocialCurrency.prototype.vals = {
@@ -46,6 +46,7 @@ SocialCurrency.prototype.vals = {
     fb_btn : ".scrr-fb",
     close : ".scrr-close",
     success_screen : ".scrr-success",
+    fail_screen : ".scrr-fail",
     never_show_btn : ".scrr-nvr-again",
     never_show_screen : ".scrr-nvr-again-screen",
 };
@@ -57,9 +58,9 @@ SocialCurrency.prototype.vals = {
 SocialCurrency.prototype.get_base_obj = function() {
     return {
         never_show : false,
-        last_shown : Date.now(),
+        last_shown : 0,
         has_shared : false,
-        last_shared : Date.now(),
+        last_shared : 0,
     }
 };
 
@@ -81,7 +82,6 @@ SocialCurrency.prototype.get_session_count = function() {
 };
 
 SocialCurrency.prototype.set_session_count = function(c) {
-    console.log(c);
     window.sessionStorage.setItem(this.vals.session_count_key, c);
 };
 
@@ -111,10 +111,10 @@ SocialCurrency.prototype.show_scrr = function() {
     if (!ls)
         ls = this.get_base_obj();
 
-    if ((ls.never_show || ls.last_shown > Date.now() - this.vals.show_every) && this.get_session_count() < 1 )
-        return false;
-    else
+    if (!ls.never_show && ls.last_shown < Date.now() - this.vals.show_every && this.get_session_count() > 1 )
         return true;
+    else
+        return false;
 }
 
 
@@ -253,7 +253,6 @@ SocialCurrency.prototype.add_show_listeners = function() {
         if (document.readyState === "complete") {
             parent_scope.add_pop_listener();
             parent_scope.add_close_listener();
-            parent_scope.add_social_listener();
             parent_scope.add_fb_sdk();
             parent_scope.add_never_show_listener();
         }
@@ -342,7 +341,7 @@ SocialCurrency.prototype.add_fb_listener = function() {
             display: 'popup',
             href: window.location.href,
         }, function(r){parent_scope.fb_resp(r)});
-    })
+    });
 };
 
 SocialCurrency.prototype.fb_resp = function(r) {
@@ -364,8 +363,18 @@ SocialCurrency.prototype.show_success = function() {
 
     var node2 = document.querySelector(this.vals.success_screen);
     node2.style.display = "initial";
+};
 
+SocialCurrency.prototype.fail_flow = function() {
+    this.show_fail();
+};
 
+SocialCurrency.prototype.show_fail = function() {
+    var node1 = document.querySelector(this.vals.social_screen);
+    node1.style.display = "none";
+
+    var node2 = document.querySelector(this.vals.fail_screen);
+    node2.style.display = "initial";
 };
 
 
@@ -379,24 +388,24 @@ SocialCurrency.prototype.insert_pop = function(parent_scope) {
 };
 
 SocialCurrency.prototype.add_fb_sdk = function() {
+    var parent_scope = this;
     window.fbAsyncInit = function() {
         FB.init({
-            appId      : '328968017464530',
+            appId      : php_vars.fb_key || 0,
             xfbml      : true,
             version    : 'v2.8'
         });
         FB.AppEvents.logPageView();
+        parent_scope.add_fb_listener();
      };
 
-    var d = document;
-    var s = 'script';
-    var id = 'facebook-jssdk';
-
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) {return;}
-    js = d.createElement(s); js.id = id;
-    js.src = "https://connect.facebook.net/en_US/sdk.js";
-    fjs.parentNode.insertBefore(js, fjs);
+     (function(d, s, id){
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) {return;}
+      js = d.createElement(s); js.id = id;
+      js.src = "//connect.facebook.net/en_US/sdk.js";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
 };
 
 SocialCurrency.prototype.add_never_show_listener = function() {
