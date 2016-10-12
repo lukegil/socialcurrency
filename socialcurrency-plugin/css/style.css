@@ -1,42 +1,71 @@
+#scrr-question,
+#scrr-question .scrr-success,
+#scrr-question .scrr-fail,
+#scrr-question .scrr-share-screen,
+#scrr-question .scrr-nvr-again-screen  {
+    display : none;
+}
+
+#scrr-question p,
+#scrr-question h1 {
+    margin : 0 !important;
+}
+
+#scrr-question .scrr-thin-text {
+    font-family: sans-serif;
+    font-weight: 100;
+    text-transform: none;
+}
+
+#scrr-question .scrr-thin-text.lg {
+    font-size: 22px;
+    line-height: 1.5em;
+}
+
+#scrr-question .scrr-thin-text.md {
+    font-size: 18px;
+    line-height: 1.25em;
+}
+#scrr-question .scrr-thin-text.sm {
+    font-size: 12px;
+    line-height: 1em;
+}
+
+#scrr-question .scrr-u-txt-left {
+    text-align: left;
+}
+
+#scrr-question .scrr-u-hover {
+    cursor : pointer;
+}
 
 #scrr-question {
     position: fixed;
     bottom : -200px;
     left : 50%;
-    transform : translate(-50%, 0);
     width : 100%;
     max-width: 500px;
+    padding : 10px 20px 30px;
     box-sizing: border-box;
     background : #fff;
-    padding : 10px 20px 30px;
     box-shadow : 0px 5px 15px 3px rgba(0,0,0,0.2);
-    display : none;
-}
-
-#scrr-question .u-hover {
-    cursor : pointer;
-}
-
-#scrr-question div.top-row {
-
+    transform : translate(-50%, 0);
 }
 
 #scrr-question h1 {
+    display: inline-block;
+    text-align: left;
     font-size : 20px;
     font-family: Garamond, Times, serif;
     font-weight: 800;
-    text-align: left;
-    display: inline-block;
-    margin : 0;
 }
 
 #scrr-question .scrr-close {
-    float : right;
     display : inline-block;
+    float : right;
 }
 
 #scrr-question .scrr-explain {
-    font-family: sans-serif;
     width : 60%;
     min-width : 300px;
     margin : 20px auto;
@@ -51,47 +80,37 @@
     border : none;
 }
 
-.scrr-explain .scrr-heart {
+#scrr-question .scrr-explain .scrr-heart {
     width : 36px;
 }
 
 #scrr-question .scrr-explain p {
-    text-align: left;
     padding : 0 10px;
-    margin : 0;
-    font-size : 18px;
-    line-height : 1.25em;
-    font-family: sans-serif;
-    font-weight: 100;
-    text-transform: none;
 }
 
 #scrr-question .scrr-decision .scrr-decision-left,
 #scrr-question .scrr-decision .scrr-decision-right {
     display : inline-block;
-    width : 49%;
-    text-align : center;
     float : left;
-    margin-top: 20px;
-    margin-bottom: 20px;
+    width : 49%;
     height: 40px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    text-align : center;
 }
 
-.scrr-decision-left .scrr-nvr-again {
-    font-size: 12px;
-    font-family: sans-serif;
-    font-weight: 100;
+#scrr-question .scrr-decision-left .scrr-nvr-again {
     line-height: 40px;
 }
 
 #scrr-question .scrr-btn {
     display : inline-block;
-    padding : 5px 10px;
-    background-color : #2196F3;
-    box-shadow : 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-    color : #fff;
     width : 75%;
     height : 40px;
+    padding : 5px 10px;
+    background-color : #2196F3;
+    color : #fff;
+    box-shadow : 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
     line-height: 40px;
 }
 
@@ -104,21 +123,16 @@
     border-radius : 100%;
 }
 
-.scrr-share-screen,
-.scrr-nvr-again-screen {
-    display : none;
-}
-
 #scrr-question .scrr-fb,
-.scrr-share-screen .scrr-twtr {
+#scrr-question .scrr-share-screen .scrr-twtr {
     position : relative;
-    border-radius : 50px;
     width : 70%;
+    min-width : 150px;
+    height : 40px;
     margin : 0 auto;
     overflow : hidden;
+    border-radius : 50px;
     color : #fff;
-    height : 40px;
-    min-width : 150px;
 }
 
 #scrr-question .scrr-fb {
@@ -131,12 +145,12 @@
 
 #scrr-question .scrr-fb .scrr-fb--icon,
 .scrr-share-screen .scrr-twtr .scrr-twtr--icon {
-    position : absolute;;
     display : inline-block;
+    position : absolute;
     top : 50%;
     left : 0;
-    transform : translateY(-50%);
     width : 25%;
+    transform : translateY(-50%);
     padding : 5px 5px 5px 10px;
     text-align: center;
 }
@@ -154,31 +168,19 @@
 }
 
 #scrr-question .scrr-fb .scrr-fb--txt,
-.scrr-share-screen .scrr-twtr .scrr-twtr--txt {
+#scrr-question .scrr-share-screen .scrr-twtr .scrr-twtr--txt {
+    display : inline-block;
     position : absolute;;
     left : 20%;
     top : 0;
-    display : inline-block;
-    text-align : center;
     width : 79%;
+    text-align : center;
     line-height : 40px;
-    font-weight: 100;
-    font-family: sans-serif;
-}
-
-#scrr-question .scrr-success,
-#scrr-question .scrr-fail {
-    display : none;
-
 }
 
 #scrr-question .scrr-success--txt,
-#scrr-question .scrr-fail--txt {
+#scrr-question .scrr-fail--txt,
+#scrr-question .scrr-never--txt {
     margin : 20px auto;
     text-align: center;
-}
-
-#scrr-question .scrr-success--txt p,
-#scrr-question .scrr-fail--txt p {
-    margin : 0;
 }
