@@ -3,7 +3,7 @@
 return'<div class="screen-one">
     <div class="scrr-top-row">
         <h1>come here often?</h1>
-        <span class="scrr-close">&#10005;</span>
+        <span class="scrr-close u-hover">&#10005;</span>
     </div>
     <table class="scrr-explain">
         <tbody>
@@ -22,7 +22,7 @@ return'<div class="screen-one">
             <a class="scrr-nvr-again">Never show again</a>
         </div>
         <div class="scrr-decision-right">
-            <div class="scrr-fb">
+            <div class="scrr-fb u-hover">
                 <div class="scrr-fb--icon"><img src="' . plugins_url('socialcurrency-plugin') . '/img/fb-icon.png"></div>
                 <div class="scrr-fb--txt">
                     <span>Share</span>
