@@ -57,6 +57,9 @@ add_action( 'wp_enqueue_scripts', 'scrr_enqueue' );
 function scrr_enqueue() {
     wp_register_script('socialcurrency', plugins_url('socialcurrency-plugin') . '/js/socialcurrency.js');
     wp_enqueue_script('socialcurrency');
+    $data = array("fb_key" => get_option(SCRR__FB_DB_KEY));
+
+    wp_localize_script( 'socialcurrency', 'php_vars', $data );
     wp_enqueue_style('scrr-style', plugins_url('socialcurrency-plugin') . '/css/style.css');
 };
 
