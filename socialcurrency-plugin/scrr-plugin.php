@@ -27,6 +27,7 @@ function scrr_create_menu() {
 
 function scrr_register_settings() {
     register_setting( 'scrr-plugin-settings', 'scrr_fb_key' );
+
 }
 
 function scrr_admin_init() {
@@ -59,7 +60,8 @@ add_action( 'wp_enqueue_scripts', 'scrr_enqueue' );
 function scrr_enqueue() {
     wp_register_script('socialcurrency', SCRR__STATIC_FILES . 'js/socialcurrency.js');
     wp_enqueue_script('socialcurrency');
-    $data = array("fb_key" => get_option(SCRR__FB_DB_KEY));
+    $data = array("fb_key" => get_option(SCRR__FB_DB_KEY),
+                  "easylist" => get_option('scrr_easylist'));
 
     wp_localize_script( 'socialcurrency', 'php_vars', $data );
     wp_enqueue_style('scrr-style', SCRR__STATIC_FILES . 'css/style.css');
@@ -78,6 +80,19 @@ function add_scrr_modal($content) {
     echo $html;
 };
 
+register_activation_hook( __FILE__, 'scrr_activate' );
+function scrr_activate() {
+    include plugin_dir_path( __FILE__ ) . '/backend/find_easylist_matches.php';
+    $matches = implode("||", find_matches());
+    update_option('scrr_easylist', $matches);
+};
+
+wp_schedule_event(time() + 86400, 'daily', 'scrr_daily_cron');
+function scrr_daily_cron() {
+    include plugin_dir_path( __FILE__ ) . '/backend/find_easylist_matches.php';
+    $matches = implode("||", find_matches());
+    update_option('scrr_easylist', $matches);
+};
 
 
 ?>
