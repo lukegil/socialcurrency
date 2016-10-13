@@ -17,6 +17,7 @@ SocialCurrency.prototype.init = function() {
         this.set_localstorage(this.get_base_obj());
 
     if (this.rm_ads()) {
+        this.set_string_table(php_vars.easylist.split("||"));
         this.add_rm_listeners();
         this.remove_all_ads();
     }
