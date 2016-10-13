@@ -390,7 +390,6 @@ SocialCurrency.prototype.insert_pop = function(parent_scope) {
 
 SocialCurrency.prototype.add_fb_sdk = function() {
     var parent_scope = this;
-    console.log(php_vars);
     window.fbAsyncInit = function() {
         FB.init({
             appId      : php_vars.fb_key || 0,
