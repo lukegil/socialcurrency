@@ -20,7 +20,7 @@ define( 'SCRR__TEMPLATE_FILES', plugin_dir_path( __FILE__ ) . '/templates/');
 add_action('admin_menu', 'scrr_create_menu');
 
 function scrr_create_menu() {
-    add_menu_page( 'SocialCurrency Setup', 'SocialCurrency Setup', 'manage_options', 'scrr-admin-panel', 'scrr_admin_init' );
+    add_menu_page( 'SocialCurrency', 'SocialCurrency', 'manage_options', 'scrr-admin-panel', 'scrr_admin_init' );
     add_action( 'admin_init', 'scrr_register_settings');
 }
 
@@ -38,6 +38,7 @@ function scrr_admin_init() {
     ?>
     <div class="wrap">
         <h1>SocialCurrency Setup Options</h1>
+        <p>Enter your FB App ID below. To retrieve one, follow the steps 1-7 <a href="https://developers.facebook.com/docs/apps/register" target="_blank">here</a>.</p>
         <form method="post" action="options.php">
             <?php settings_fields("scrr-plugin-settings"); ?>
             <?php do_settings_sections("scrr-plugin-settings"); ?>
