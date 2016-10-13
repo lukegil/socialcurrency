@@ -14,6 +14,8 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 define( 'SCRR__PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SCRR__FB_DB_KEY', 'scrr_fb_key');
+define( 'SCRR__STATIC_FILES',  plugins_url('socialcurrency-plugin') . '/static/');
+define( 'SCRR__TEMPLATE_FILES', plugin_dir_path( __FILE__ ) . '/templates/');
 
 add_action('admin_menu', 'scrr_create_menu');
 
@@ -55,24 +57,24 @@ function scrr_admin_init() {
 
 add_action( 'wp_enqueue_scripts', 'scrr_enqueue' );
 function scrr_enqueue() {
-    wp_register_script('socialcurrency', plugins_url('socialcurrency-plugin') . '/js/socialcurrency.js');
+    wp_register_script('socialcurrency', SCRR__STATIC_FILES . 'js/socialcurrency.js');
     wp_enqueue_script('socialcurrency');
     $data = array("fb_key" => get_option(SCRR__FB_DB_KEY));
 
     wp_localize_script( 'socialcurrency', 'php_vars', $data );
-    wp_enqueue_style('scrr-style', plugins_url('socialcurrency-plugin') . '/css/style.css');
+    wp_enqueue_style('scrr-style', SCRR__STATIC_FILES . 'css/style.css');
 };
 
 add_filter('the_content', 'add_scrr_tag');
 function add_scrr_tag($content) {
-    $tag = include plugin_dir_path( __FILE__ ) . 'templates/anchor_tag.php';
+    $tag = include SCRR__TEMPLATE_FILES . 'anchor_tag.php';
     $content .= $tag;
     return $content;
 };
 
 add_filter('wp_footer', 'add_scrr_modal');
 function add_scrr_modal($content) {
-    $html = include plugin_dir_path( __FILE__ ) . 'templates/main.php';
+    $html = include SCRR__TEMPLATE_FILES . 'main.php';
     echo $html;
 };
 

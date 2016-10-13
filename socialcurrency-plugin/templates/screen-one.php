@@ -9,7 +9,7 @@ return'<div class="screen-one">
         <tbody>
             <tr>
                 <td>
-                    <img class="scrr-heart" src="' . plugins_url('socialcurrency-plugin') . '/img/heart.png">
+                    <img class="scrr-heart" src="' . SCRR__STATIC_FILES . 'img/heart.png">
                 </td>
                 <td>
                     <p class="scrr-thin-text md scrr-u-txt-left">Share this article and make ads disappear for a week.</p>
@@ -23,7 +23,7 @@ return'<div class="screen-one">
         </div>
         <div class="scrr-decision-right">
             <div class="scrr-fb scrr-u-hover">
-                <div class="scrr-fb--icon"><img src="' . plugins_url('socialcurrency-plugin') . '/img/fb-icon.png"></div>
+                <div class="scrr-fb--icon"><img src="' . SCRR__STATIC_FILES . 'img/fb-icon.png"></div>
                 <div class="scrr-fb--txt">
                     <span class="scrr-thin-text md">Share</span>
                 </div>
