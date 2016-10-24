@@ -17,19 +17,19 @@ define( 'SCRR__FB_DB_KEY', 'scrr_fb_key');
 define( 'SCRR__STATIC_FILES',  plugins_url('socialcurrency-plugin') . '/static/');
 define( 'SCRR__TEMPLATE_FILES', plugin_dir_path( __FILE__ ) . '/templates/');
 
+/** Adds scrr to the LH Menu; calls init **/
 add_action('admin_menu', 'scrr_create_menu');
-
 function scrr_create_menu() {
     add_menu_page( 'SocialCurrency', 'SocialCurrency', 'manage_options', 'scrr-admin-panel', 'scrr_admin_init' );
     add_action( 'admin_init', 'scrr_register_settings');
 }
 
-
+/** Add plugin fields to DB **/
 function scrr_register_settings() {
     register_setting( 'scrr-plugin-settings', 'scrr_fb_key' );
-
 }
 
+/** The admin page **/
 function scrr_admin_init() {
     if ( !current_user_can( 'manage_options' ) )  {
 		wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
@@ -57,6 +57,7 @@ function scrr_admin_init() {
     <?php
 };
 
+/** Add js to frontend pages **/
 add_action( 'wp_enqueue_scripts', 'scrr_enqueue' );
 function scrr_enqueue() {
     wp_register_script('socialcurrency', SCRR__STATIC_FILES . 'js/socialcurrency.js');
@@ -68,6 +69,7 @@ function scrr_enqueue() {
     wp_enqueue_style('scrr-style', SCRR__STATIC_FILES . 'css/style.css');
 };
 
+/** Insert an empty div at the bottom of a post **/
 add_filter('the_content', 'add_scrr_tag');
 function add_scrr_tag($content) {
     $tag = include SCRR__TEMPLATE_FILES . 'anchor_tag.php';
@@ -75,12 +77,16 @@ function add_scrr_tag($content) {
     return $content;
 };
 
+/** Add the widget to the footer
+    TODO : load this via ajax only if needed
+**/
 add_filter('wp_footer', 'add_scrr_modal');
 function add_scrr_modal($content) {
     $html = include SCRR__TEMPLATE_FILES . 'main.php';
     echo $html;
 };
 
+/** when plugin is activated, find advert tags on pages and save them to db **/
 register_activation_hook( __FILE__, 'scrr_activate' );
 function scrr_activate() {
     include plugin_dir_path( __FILE__ ) . '/backend/find_easylist_matches.php';
@@ -88,6 +94,7 @@ function scrr_activate() {
     update_option('scrr_easylist', $matches);
 };
 
+/** Every day, check for advert tags, in case some have been added or removed **/
 wp_schedule_event(time() + 86400, 'daily', 'scrr_daily_cron');
 function scrr_daily_cron() {
     include plugin_dir_path( __FILE__ ) . '/backend/find_easylist_matches.php';
