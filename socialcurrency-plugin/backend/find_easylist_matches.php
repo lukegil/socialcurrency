@@ -121,6 +121,7 @@
 
     };
 
+    /** Check every easylist tag and see if it's on the page **/
     function find_matches() {
         $easy_list = SCRR__STATIC_FILES . "easylist.txt";
 
